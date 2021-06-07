@@ -8,26 +8,26 @@ import (
 
 type (
 	Trie struct {
-		Root *node
+		root *node
 	}
 	node struct {
 		// 匹配的url(注册时提供的url，例如：/p/:lang/doc)
-		Pattern string
+		pattern string
 		// url中的一段，例如：p  :lang  doc
-		Part string
+		part string
 		// 子节点
-		Children []*node
+		children []*node
 		// 任意节点都能匹配，例如当前节点的part是:lang或者*filepath，则IsWild为true
-		IsWild bool
+		isWild bool
 	}
 )
 
 func NewTrie() *Trie {
 	root := &node{
-		Children: make([]*node, 0),
+		children: make([]*node, 0),
 	}
 	return &Trie{
-		Root: root,
+		root: root,
 	}
 }
 
@@ -44,9 +44,9 @@ func (t Trie) parsePattern(pattern string) []string {
 }
 
 func (t *Trie) matchChild(n *node, part string) *node {
-	for _, child := range n.Children {
+	for _, child := range n.children {
 		// 找到匹配的part
-		if child.Part == part || child.IsWild {
+		if child.part == part || child.isWild {
 			return child
 		}
 	}
@@ -55,9 +55,9 @@ func (t *Trie) matchChild(n *node, part string) *node {
 
 func (t *Trie) matchChildren(n *node, part string) []*node {
 	nodes := make([]*node, 0)
-	for _, child := range n.Children {
+	for _, child := range n.children {
 		// 找到匹配的part
-		if child.Part == part || child.IsWild {
+		if child.part == part || child.isWild {
 			nodes = append(nodes, child)
 		}
 	}
@@ -68,15 +68,15 @@ func (t *Trie) Insert(pattern string) {
 	parts := t.parsePattern(pattern)
 	found, _ := t.Search(pattern)
 	if found != nil {
-		panic(fmt.Sprintf("Repeated pattern between %s and %s ", pattern, found.Pattern))
+		panic(fmt.Sprintf("Repeated pattern between %s and %s ", pattern, found.pattern))
 	}
-	t.insert(t.Root, pattern, parts, 0)
+	t.insert(t.root, pattern, parts, 0)
 }
 
 func (t *Trie) insert(n *node, pattern string, parts []string, index int) {
 	// 最后一part，打上pattern
 	if len(parts) == index {
-		n.Pattern = pattern
+		n.pattern = pattern
 		return
 	}
 
@@ -85,10 +85,10 @@ func (t *Trie) insert(n *node, pattern string, parts []string, index int) {
 	// 没找到，创建一个新的节点
 	if findNode == nil {
 		findNode = new(node)
-		findNode.Part = part
+		findNode.part = part
 		// *filepath/:param，参数可以匹配任意值
-		findNode.IsWild = part[0] == '*' || part[0] == ':'
-		n.Children = append(n.Children, findNode)
+		findNode.isWild = part[0] == '*' || part[0] == ':'
+		n.children = append(n.children, findNode)
 	}
 
 	t.insert(findNode, pattern, parts, index+1)
@@ -96,10 +96,10 @@ func (t *Trie) insert(n *node, pattern string, parts []string, index int) {
 
 func (t Trie) Search(pattern string) (*node, map[string]string) {
 	parts := t.parsePattern(pattern)
-	n := t.search(t.Root, pattern, parts, 0)
+	n := t.search(t.root, pattern, parts, 0)
 	var params map[string]string
 	if n != nil {
-		params = t.getParams(n.Pattern, pattern)
+		params = t.getParams(n.pattern, pattern)
 	}
 	return n, params
 }
@@ -107,7 +107,7 @@ func (t Trie) Search(pattern string) (*node, map[string]string) {
 func (t Trie) search(n *node, pattern string, parts []string, index int) *node {
 	// 当前节点是最后一个
 	if len(parts) == index {
-		if n.Pattern == "" {
+		if n.pattern == "" {
 			return nil
 		}
 		return n
@@ -118,7 +118,7 @@ func (t Trie) search(n *node, pattern string, parts []string, index int) *node {
 	children := t.matchChildren(n, part)
 	for _, child := range children {
 		// *filepath
-		if strings.HasPrefix(child.Part, "*") {
+		if strings.HasPrefix(child.part, "*") {
 			return child
 		}
 		found := t.search(child, pattern, parts, index+1)

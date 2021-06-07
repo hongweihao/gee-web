@@ -10,9 +10,9 @@ func TestInsert(t *testing.T) {
 	tree.Insert("/hello/docker")
 	tree.Insert("/static/*filepath")
 
-	t.Log(tree.Root.Part)
-	t.Log(tree.Root.Children[0].Part)
-	t.Log(tree.Root.Children[0].Children[0].Part)
+	t.Log(tree.root.part)
+	t.Log(tree.root.children[0].part)
+	t.Log(tree.root.children[0].children[0].part)
 }
 
 func TestInsertRepeatedly(t *testing.T) {
@@ -20,18 +20,18 @@ func TestInsertRepeatedly(t *testing.T) {
 	tree.Insert("/hello/world")
 	tree.Insert("/:hello/world")
 
-	t.Log(tree.Root.Part)
-	t.Log(tree.Root.Children[0].Part)
-	t.Log(tree.Root.Children[0].Children[0].Part)
+	t.Log(tree.root.part)
+	t.Log(tree.root.children[0].part)
+	t.Log(tree.root.children[0].children[0].part)
 }
 
 func TestAnyUrl(t *testing.T) {
 	tree := NewTrie()
 	tree.Insert("/p/:lang/doc")
 
-	t.Log(tree.Root.Part)
-	t.Log(tree.Root.Children[0].Part)
-	t.Log(tree.Root.Children[0].Children[0].Part)
+	t.Log(tree.root.part)
+	t.Log(tree.root.children[0].part)
+	t.Log(tree.root.children[0].children[0].part)
 }
 
 func TestSearch(t *testing.T) {
@@ -41,15 +41,15 @@ func TestSearch(t *testing.T) {
 	tree.Insert("/static/*filepath")
 
 	searchNode1, params1 := tree.Search("/")
-	t.Log(searchNode1.Pattern)
+	t.Log(searchNode1.pattern)
 	t.Log(params1)
 
 	//searchNode2, params2 := tree.Search("/test/world")
-	//t.Log(searchNode2.Pattern)
+	//t.Log(searchNode2.pattern)
 	//t.Log(params2)
 
 	searchNode3, params3 := tree.Search("/static/css/style.css")
-	t.Log(searchNode3.Pattern)
+	t.Log(searchNode3.pattern)
 	t.Log(params3)
 }
 
@@ -60,15 +60,15 @@ func TestSearchParam(t *testing.T) {
 	tree.Insert("/")
 
 	searchNode1, params1 := tree.Search("/")
-	t.Log(searchNode1.Pattern)
+	t.Log(searchNode1.pattern)
 	t.Log(params1)
 
 	searchNode2, params2 := tree.Search("/hello")
-	t.Log(searchNode2.Pattern)
+	t.Log(searchNode2.pattern)
 	t.Log(params2)
 
 	searchNode3, params3 := tree.Search("/hello/world")
-	t.Log(searchNode3.Pattern)
+	t.Log(searchNode3.pattern)
 	t.Log(params3)
 }
 

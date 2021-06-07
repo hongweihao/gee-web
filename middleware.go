@@ -16,7 +16,7 @@ func Logger() HandleFunc {
 		// Process request
 		c.Next()
 		// Calculate resolution time
-		log.Printf("[Gee Web] [%d] %s in %v", c.StatusCode, c.Req.RequestURI, time.Since(t))
+		log.Printf("[Gee Web] [%d] %s in %v", c.statusCode, c.req.RequestURI, time.Since(t))
 	}
 }
 

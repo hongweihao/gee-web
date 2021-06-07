@@ -66,6 +66,6 @@ func (routerGroup *RouterGroup) createStaticHandler(pattern, root string) Handle
 			return
 		}
 
-		fileServer.ServeHTTP(c.Rw, c.Req)
+		fileServer.ServeHTTP(c.writer, c.req)
 	}
 }
