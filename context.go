@@ -33,6 +33,7 @@ func NewContext(rw http.ResponseWriter, req *http.Request, middlewares []HandleF
 	}
 }
 
+// todo parse repeatedly
 func (c *Context) PostForm(key string) string {
 	c.req.ParseForm()
 	return c.req.PostForm.Get(key)
