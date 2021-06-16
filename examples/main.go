@@ -21,9 +21,9 @@ func main() {
 	engine.Use(printRequest)
 
 	// 使用GET，POST
-	engine.GET("/test", test)           // curl http://localhost:8088/test
-	engine.GET("/test/:id", testId)     // curl http://localhost:8088/test/1234
-	engine.POST("/test_post", testPost) //curl -X POST http://localhost:8088/test_post
+	engine.GET("/test", test)
+	engine.GET("/test/:id", testId)
+	engine.POST("/test_post", testPost)
 
 	// 使用 Group
 	userGroup := engine.Group("/user")
