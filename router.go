@@ -34,24 +34,24 @@ func (router *Router) addRouter(method, pattern string, handle HandleFunc) {
 
 func (router *Router) handle(c *Context) {
 
-	tree := router.roots[c.method]
-	n, param := tree.Search(c.path)
+	tree := router.roots[c.Method]
+	n, param := tree.Search(c.Path)
 	if n == nil {
 		c.middlewares = append(c.middlewares, func(c *Context) {
 			c.Status(http.StatusNotFound)
-			c.String(http.StatusNotFound, "unknown path:"+c.path)
+			c.String(http.StatusNotFound, "unknown Path:"+c.Path)
 		})
 		c.Next()
 		return
 	}
 
-	key := strings.Join([]string{c.method, n.pattern}, "-")
+	key := strings.Join([]string{c.Method, n.pattern}, "-")
 	c.param = param
 	handler, ok := router.handlers[key]
 	if !ok {
 		c.middlewares = append(c.middlewares, func(c *Context) {
 			c.Status(http.StatusNotFound)
-			c.String(http.StatusNotFound, "unknown path:"+c.path)
+			c.String(http.StatusNotFound, "unknown Path:"+c.Path)
 		})
 		c.Next()
 		return

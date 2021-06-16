@@ -1,6 +1,8 @@
 package gee
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type RouterGroup struct {
 	prefix     string
@@ -49,14 +51,14 @@ func (routerGroup *RouterGroup) Static(pattern, root string) {
 func (routerGroup *RouterGroup) createStaticHandler(pattern, root string) HandleFunc {
 	reqPath := routerGroup.prefix + pattern
 	fileSystem := http.Dir(root)
-	// StripPrefix 用于将请求重定向到fileServer之前将 req path 的 prefix 拿掉
+	// StripPrefix 用于将请求重定向到fileServer之前将 Request Path 的 prefix 拿掉
 	fileServer := http.StripPrefix(reqPath, http.FileServer(fileSystem))
 
-	// 处理器逻辑：从req path 中获取除prefix之外的文件名称并查看文件是否存在
+	// 处理器逻辑：从req Path 中获取除prefix之外的文件名称并查看文件是否存在
 	// 如果不存在则直接返回错误，如果存在则将请求交给httpServer静态服务器
 	return func(c *Context) {
-		fileName, ok := c.ParamGet("filepath")
-		if !ok {
+		fileName := c.Param("filepath")
+		if fileName == "" {
 			c.String(http.StatusNotFound, "Not found file:"+fileName+"("+reqPath+" -> "+root+")")
 			return
 		}
@@ -66,6 +68,6 @@ func (routerGroup *RouterGroup) createStaticHandler(pattern, root string) Handle
 			return
 		}
 
-		fileServer.ServeHTTP(c.writer, c.req)
+		fileServer.ServeHTTP(c.responseWriter, c.Request)
 	}
 }

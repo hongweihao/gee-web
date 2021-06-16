@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>List</title>
+<body>
+{{range $index, $ele := .list }}
+<p>{{ $index }}: {{ $ele.Name }} is {{ $ele.Age }} years old</p>
+{{ end }}
+</body>
+</html>

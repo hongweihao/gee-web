@@ -8,7 +8,10 @@ import (
 	"strings"
 )
 
-type HandleFunc func(c *Context)
+type (
+	HandleFunc func(c *Context)
+	H          map[string]interface{}
+)
 
 type Engine struct {
 	*RouterGroup

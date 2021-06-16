@@ -7,12 +7,12 @@ import (
 )
 
 type Context struct {
-	req        *http.Request
-	writer     http.ResponseWriter
-	path       string
-	method     string
-	param      map[string]string
-	statusCode int
+	Request        *http.Request
+	responseWriter http.ResponseWriter
+	Path           string
+	Method         string
+	param          map[string]string
+	StatusCode     int
 
 	// middleware
 	middlewares      []HandleFunc
@@ -23,64 +23,61 @@ type Context struct {
 
 func NewContext(rw http.ResponseWriter, req *http.Request, middlewares []HandleFunc, engine *Engine) *Context {
 	return &Context{
-		req:              req,
-		writer:           rw,
-		path:             req.URL.Path,
-		method:           req.Method,
+		Request:          req,
+		responseWriter:   rw,
+		Path:             req.URL.Path,
+		Method:           req.Method,
 		middlewares:      middlewares,
 		middlewaresIndex: -1,
 		engine:           engine,
 	}
 }
 
-// todo parse repeatedly
 func (c *Context) PostForm(key string) string {
-	c.req.ParseForm()
-	return c.req.PostForm.Get(key)
+	return c.Request.FormValue(key)
 }
 
 func (c *Context) Query(key string) string {
-	return c.req.URL.Query().Get(key)
+	return c.Request.URL.Query().Get(key)
 }
 
 func (c *Context) Status(code int) {
-	c.statusCode = code
+	c.StatusCode = code
 }
 
 func (c *Context) SetHeader(key string, value string) {
-	c.writer.Header().Set(key, value)
+	c.responseWriter.Header().Set(key, value)
 }
 
-func (c *Context) JSON(code int, rsp interface{}) {
+func (c *Context) JSON(code int, resp interface{}) {
 	c.SetHeader("Content-Type", "application/json")
-	bs, err := json.Marshal(rsp)
+	bs, err := json.Marshal(resp)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
-		c.writer.Write([]byte(err.Error()))
+		c.responseWriter.Write([]byte(err.Error()))
 		return
 	}
 	c.Status(code)
-	c.writer.Write(bs)
+	c.responseWriter.Write(bs)
 }
 func (c *Context) HTML(code int, name string, data interface{}) {
 	c.SetHeader("Content-Type", "text/html")
 	c.Status(code)
-	if err := c.engine.templates.ExecuteTemplate(c.writer, name, data); err != nil {
+	if err := c.engine.templates.ExecuteTemplate(c.responseWriter, name, data); err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 	}
 }
 func (c *Context) String(code int, text string) {
 	c.SetHeader("Content-Type", "text/plain")
 	c.Status(code)
-	c.writer.Write([]byte(text))
+	c.responseWriter.Write([]byte(text))
 }
 func (c *Context) Data(code int, data []byte) {
 	c.Status(code)
-	c.writer.Write(data)
+	c.responseWriter.Write(data)
 }
-func (c *Context) ParamGet(key string) (string, bool) {
-	v, ok := c.param[key]
-	return v, ok
+func (c *Context) Param(key string) string {
+	return c.param[key]
 }
 func (c *Context) Next() {
 	c.middlewaresIndex++
