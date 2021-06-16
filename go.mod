@@ -1,3 +1,3 @@
 module github.com/hongweihao/gee-web
 
-go 1.14
+go 1.16
