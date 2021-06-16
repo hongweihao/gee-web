@@ -1,3 +1,3 @@
-module gee-web
+module github.com/hongweihao/gee-web
 
 go 1.14
