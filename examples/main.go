@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/hongweihao/gee-web"
 	"html/template"
-	gee "github.com/hongweihao/gee-web"
 	"io/ioutil"
 	"log"
 	"time"
